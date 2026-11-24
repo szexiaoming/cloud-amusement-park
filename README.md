@@ -7,8 +7,7 @@
 **🌐 在线体验 / Live demo:** <https://szexiaoming.github.io/cloud-amusement-park/>
 
 <p align="center">
-  <img src="screenshots/town-day.png" width="49%" alt="白天的云上小镇">
-  <img src="screenshots/town-night.png" width="49%" alt="夜晚的云上小镇">
+  <img src="screenshots/town-night.png" width="64%" alt="夜晚的云上小镇">
 </p>
 
 ## ✨ 特色 / Features
