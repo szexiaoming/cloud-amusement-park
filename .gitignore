@@ -1,0 +1,10 @@
+node_modules
+dist
+.pnpm-store
+.DS_Store
+*.log
+
+# local screenshots & temp scripts (kept locally, not in the repo)
+shot-*.png
+crop_*.png
+tmp_crop.py

@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Sze的小世界 · Sze's Little World</title>
+    <style>
+      :root {
+        --cream: #fff4df;
+        --wood: #92745e;
+        --wood-dark: #7a5f4b;
+        --mint: #a8dcc5;
+        --ink: #5c6b7a;
+        --lavender: #827ca6;
+      }
+
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #cdeaf4;
+        font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', 'Segoe UI',
+          system-ui, sans-serif;
+      }
+
+      #app {
+        position: fixed;
+        inset: 0;
+      }
+
+      #app canvas {
+        display: block;
+        touch-action: none;
+        cursor: grab;
+      }
+      #app canvas:active {
+        cursor: grabbing;
+      }
+
+      /* Small cozy title */
+      #title {
+        position: fixed;
+        top: 16px;
+        left: 20px;
+        pointer-events: none;
+        font-weight: 700;
+        font-size: 20px;
+        letter-spacing: 0.04em;
+        color: var(--ink);
+        background: rgba(255, 244, 223, 0.72);
+        border: 1.5px solid rgba(146, 116, 94, 0.35);
+        border-radius: 999px;
+        padding: 7px 16px;
+        box-shadow: 0 2px 8px rgba(90, 120, 130, 0.12);
+        backdrop-filter: blur(3px);
+      }
+
+      /* Day / Night toggle */
+      #mode-toggle {
+        position: fixed;
+        top: 16px;
+        right: 20px;
+        display: flex;
+        gap: 2px;
+        padding: 4px;
+        background: rgba(255, 244, 223, 0.8);
+        border: 1.5px solid rgba(146, 116, 94, 0.35);
+        border-radius: 999px;
+        box-shadow: 0 2px 10px rgba(90, 120, 130, 0.15);
+        backdrop-filter: blur(3px);
+      }
+      .mode-btn {
+        font-family: inherit;
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--ink);
+        background: transparent;
+        border: none;
+        border-radius: 999px;
+        padding: 7px 14px;
+        cursor: pointer;
+        transition: background 0.2s ease, color 0.2s ease, transform 0.1s ease;
+      }
+      .mode-btn:hover {
+        background: rgba(168, 220, 197, 0.35);
+      }
+      .mode-btn:active {
+        transform: scale(0.96);
+      }
+      .mode-btn[data-mode='day'].active {
+        background: var(--mint);
+        color: var(--wood-dark);
+      }
+      .mode-btn[data-mode='night'].active {
+        background: var(--lavender);
+        color: #fff;
+      }
+
+      /* Hover label for attractions */
+      #hover-label {
+        position: fixed;
+        left: 0;
+        top: 0;
+        display: none;
+        pointer-events: none;
+        transform: translate(-50%, -130%);
+        background: rgba(255, 244, 223, 0.92);
+        color: var(--wood-dark);
+        border: 1.5px solid rgba(146, 116, 94, 0.4);
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-size: 15px;
+        font-weight: 600;
+        white-space: nowrap;
+        box-shadow: 0 4px 14px rgba(90, 120, 130, 0.18);
+        transition: opacity 0.15s ease;
+      }
+
+      /* Subtle caption (Day / Night) */
+      #caption {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        pointer-events: none;
+        max-width: 70vw;
+        text-align: center;
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--ink);
+        background: rgba(255, 244, 223, 0.66);
+        border: 1px solid rgba(146, 116, 94, 0.28);
+        border-radius: 999px;
+        padding: 6px 16px;
+        box-shadow: 0 2px 8px rgba(90, 120, 130, 0.1);
+        backdrop-filter: blur(3px);
+        opacity: 1;
+        transition: opacity 0.4s ease;
+      }
+
+      /* Discreet reset-view button */
+      #reset-btn {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        pointer-events: auto;
+        font-family: inherit;
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--wood-dark);
+        background: rgba(255, 244, 223, 0.85);
+        border: 1.5px solid rgba(146, 116, 94, 0.4);
+        border-radius: 999px;
+        padding: 9px 18px;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(90, 120, 130, 0.15);
+        backdrop-filter: blur(3px);
+        transition: background 0.15s ease, transform 0.1s ease;
+      }
+      #reset-btn:hover {
+        background: #fff4df;
+      }
+      #reset-btn:active {
+        transform: scale(0.96);
+      }
+
+      /* District card — a cozy journal / notice board */
+      #memory-card {
+        position: fixed;
+        left: 20px;
+        bottom: 20px;
+        width: min(380px, calc(100vw - 40px));
+        max-height: min(72vh, 600px);
+        overflow-y: auto;
+        z-index: 20;
+        padding: 16px 18px 18px;
+        background: rgba(255, 244, 223, 0.97);
+        border: 1.5px solid rgba(146, 116, 94, 0.42);
+        border-radius: 18px;
+        box-shadow: 0 10px 34px rgba(70, 90, 100, 0.28);
+        color: #5c4a3c;
+        opacity: 0;
+        transform: translateY(16px) scale(0.98);
+        pointer-events: none;
+        transition: opacity 0.28s ease, transform 0.28s ease;
+        backdrop-filter: blur(5px);
+      }
+      #memory-card.open {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        pointer-events: auto;
+      }
+      #memory-card .mc-close {
+        position: absolute;
+        top: 10px;
+        right: 12px;
+        width: 26px;
+        height: 26px;
+        border: none;
+        border-radius: 50%;
+        background: rgba(146, 116, 94, 0.14);
+        color: var(--wood-dark);
+        font-size: 17px;
+        line-height: 1;
+        cursor: pointer;
+      }
+      #memory-card .mc-close:hover {
+        background: rgba(146, 116, 94, 0.28);
+      }
+      #memory-card .mc-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-right: 30px;
+      }
+      #memory-card .mc-letter {
+        flex: none;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: #e8c57a;
+        color: #6d4f3a;
+        font-weight: 800;
+        font-size: 16px;
+      }
+      #memory-card .mc-titles {
+        min-width: 0;
+      }
+      #memory-card .mc-name {
+        margin: 0;
+        font-size: 21px;
+        letter-spacing: 0.02em;
+        color: #6d4f3a;
+      }
+      #memory-card .mc-english {
+        font-size: 12px;
+        color: rgba(122, 95, 75, 0.7);
+        letter-spacing: 0.04em;
+      }
+      #memory-card .mc-theme {
+        margin-top: 8px;
+        font-size: 13px;
+        color: rgba(122, 95, 75, 0.9);
+      }
+      #memory-card .mc-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+      }
+      #memory-card .mc-tag {
+        font-size: 12px;
+        padding: 3px 10px;
+        border-radius: 999px;
+        background: rgba(168, 220, 197, 0.5);
+        color: #4f6b58;
+      }
+      #memory-card .mc-story {
+        margin: 12px 0 0;
+        font-size: 14px;
+        line-height: 1.75;
+        color: #5c4a3c;
+        white-space: pre-wrap;
+      }
+      #memory-card .mc-projects {
+        margin-top: 12px;
+      }
+      #memory-card .mc-project {
+        margin-top: 10px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(241, 224, 192, 0.55);
+        border: 1px solid rgba(146, 116, 94, 0.2);
+      }
+      #memory-card .mc-proj-title {
+        font-weight: 700;
+        font-size: 14px;
+        color: #6d4f3a;
+      }
+      #memory-card .mc-proj-summary {
+        margin-top: 4px;
+        font-size: 13px;
+        line-height: 1.65;
+        opacity: 0.92;
+      }
+      #memory-card .mc-stack {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 8px;
+      }
+      #memory-card .mc-chip {
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: rgba(255, 244, 223, 0.9);
+        border: 1px solid rgba(146, 116, 94, 0.22);
+        color: #7a5f4b;
+      }
+      #memory-card .mc-links {
+        margin-top: 8px;
+        display: flex;
+        gap: 12px;
+      }
+      #memory-card .mc-links a {
+        font-size: 13px;
+        color: #b05f4a;
+      }
+      #memory-card .mc-note {
+        margin-top: 12px;
+        font-size: 12px;
+        color: rgba(122, 95, 75, 0.75);
+        font-style: italic;
+      }
+      /* Season + real-world weather chip */
+      #world-status {
+        position: fixed;
+        left: 20px;
+        top: 62px;
+        z-index: 12;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 999px;
+        background: rgba(255, 244, 223, 0.86);
+        border: 1px solid rgba(146, 116, 94, 0.28);
+        color: #6d4f3a;
+        font-size: 12.5px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        pointer-events: none;
+        backdrop-filter: blur(4px);
+        opacity: 0;
+        transform: translateY(-4px);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+      }
+      #world-status.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      @media (max-width: 560px) {
+        #world-status {
+          top: 56px;
+          font-size: 12px;
+        }
+      }
+      @media (max-width: 560px) {
+        #memory-card {
+          left: 12px;
+          right: 12px;
+          bottom: 72px;
+          width: auto;
+          max-height: 60vh;
+        }
+      }
+      /* Destination selector + follow-camera exit */
+      #destination-panel {
+        position: fixed;
+        right: 20px;
+        top: 96px;
+        z-index: 22;
+        width: 212px;
+        padding: 14px 14px 12px;
+        background: rgba(255, 244, 223, 0.97);
+        border: 1.5px solid rgba(146, 116, 94, 0.4);
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(70, 90, 100, 0.25);
+        color: #5c4a3c;
+        opacity: 0;
+        transform: translateY(-6px);
+        pointer-events: none;
+        transition: opacity 0.25s ease, transform 0.25s ease;
+      }
+      #destination-panel.open {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+      }
+      #destination-panel .dp-title {
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #6d4f3a;
+      }
+      #destination-panel .dp-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      #destination-panel .dp-list button {
+        padding: 8px 10px;
+        border-radius: 10px;
+        border: 1px solid rgba(146, 116, 94, 0.25);
+        background: rgba(255, 255, 255, 0.6);
+        color: #6d4f3a;
+        font-size: 13px;
+        text-align: left;
+        cursor: pointer;
+      }
+      #destination-panel .dp-list button:hover {
+        background: rgba(232, 197, 122, 0.35);
+      }
+      #destination-panel .dp-close {
+        position: absolute;
+        top: 8px;
+        right: 10px;
+        width: 22px;
+        height: 22px;
+        border: none;
+        border-radius: 50%;
+        background: rgba(146, 116, 94, 0.14);
+        color: #7a5f4b;
+        cursor: pointer;
+        font-size: 14px;
+        line-height: 1;
+      }
+      #exit-follow {
+        position: fixed;
+        right: 20px;
+        bottom: 66px;
+        z-index: 22;
+        padding: 9px 16px;
+        border-radius: 999px;
+        border: 1px solid rgba(146, 116, 94, 0.35);
+        background: rgba(255, 244, 223, 0.95);
+        color: #6d4f3a;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+        box-shadow: 0 6px 18px rgba(70, 90, 100, 0.22);
+      }
+      #exit-follow.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="title">Sze的小世界</div>
+    <div id="world-status" aria-live="polite"></div>
+    <div id="mode-toggle" role="group" aria-label="昼夜切换">
+      <button id="mode-day" class="mode-btn" data-mode="day" type="button">☀️ 晴日</button>
+      <button id="mode-night" class="mode-btn" data-mode="night" type="button">🌙 星夜</button>
+    </div>
+    <div id="hover-label"></div>
+    <div id="caption">今天也在云上慢慢玩。</div>
+    <button id="reset-btn" type="button">重置视角</button>
+    <aside id="memory-card" aria-hidden="true"></aside>
+    <div id="destination-panel" aria-hidden="true">
+      <div class="dp-title">选择目的地</div>
+      <div class="dp-list" id="dp-list"></div>
+      <button class="dp-close" id="dp-close" type="button" aria-label="关闭">×</button>
+    </div>
+    <button id="exit-follow" type="button">退出跟随</button>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,80 @@
+{
+  "version": "sze-layout-v1",
+  "name": "Sze的小世界",
+  "units": "final world units; no additional WORLD_SCALE",
+  "axes": {"up":"+Y", "screenRight":"+X at default camera", "front":"+Z", "back":"-Z", "yaw":"degrees around +Y, local entrance +Z; positive turns toward +X"},
+  "island": {
+    "boundaryXZ": [[-35,0],[-32,-23],[-20,-26],[0,-27],[20,-26],[32,-23],[35,-10],[34,6],[28,17],[15,23],[-2,25],[-20,22],[-31,13]],
+    "topYRange":[0,1.2], "undersideMinY":-7,
+    "edgeThickness":2, "continuousRaisedRim":false,
+    "boundaryRule":"Round corners inward; retain >= 2 world units from rail centerline to land boundary. No spline overshoot outside the authored outline."
+  },
+  "camera": {
+    "type":"orthographic", "position":[0,50,73], "target":[0,2,-1],
+    "near":0.1,"far":250,"defaultZoom":1,
+    "fit":"Project terrain, underside and occupied destination/ride bounds onto camera right/up; pad each dimension by 14%; expand one dimension to viewport aspect; center projected bounds. Exclude balloons, clouds, particles, helpers and labels from fitting. Preserve view direction.",
+    "polarDegrees":[25,68], "zoomRange":[0.75,3.2],
+    "reset":"restore this exact camera orientation, fitted frustum and target; do not rotate the island"
+  },
+  "destinations":[
+    {"id":"memory","number":"01","name":"回忆小屋","centerXZ":[-14,3],"padY":0.1,"yawDeg":30,"status":"built","envelopeXZ":[6,5],"maxHeight":5,"doorApronXZ":[-12.5,5.6],"gardenCenterXZ":[-14,8]},
+    {"id":"academy","number":"02","name":"知识学园","centerXZ":[-14,-8],"padY":0.5,"yawDeg":25,"status":"built","envelopeXZ":[7,6],"maxHeight":6,"doorApronXZ":[-12.6,-5],"gardenCenterXZ":[-14,-2]},
+    {"id":"research","number":"03","name":"AI 研究塔","centerXZ":[1,-12],"padY":0.9,"yawDeg":0,"status":"built","envelopeXZ":[5.5,5.5],"maxHeight":9.3,"doorApronXZ":[1,-8.7]},
+    {"id":"robotics","number":"04","name":"机器人工坊","centerXZ":[-24,-7],"padY":0.5,"yawDeg":60,"status":"planned","envelopeXZ":[6,6],"maxHeight":2,"doorApronXZ":[-20.8,-5.2]},
+    {"id":"studio","number":"05","name":"创造工作室","centerXZ":[-23,9],"padY":0.1,"yawDeg":60,"status":"planned","envelopeXZ":[6,5],"maxHeight":2,"doorApronXZ":[-19.8,10.8]},
+    {"id":"station","number":"06","name":"未来车站","centerXZ":[6,5],"padY":0.1,"yawDeg":-30,"status":"planned","envelopeXZ":[6,5],"maxHeight":2,"doorApronXZ":[4.5,7.6]}
+  ],
+  "placementRules":{
+    "envelope":"Axis-aligned reserved XZ bounds after yaw, including eaves, steps and signs; not target dimensions to stretch a mesh into.",
+    "modelScale":"Keep existing actual world-space model dimensions where they fit. Do not apply the previous 1.3 scale twice. If a complete model exceeds its reserved bounds, report before moving destinations or distorting architecture.",
+    "doors":"Orient entrances by yawDeg. Extend last path segment from doorApronXZ to the measured entrance; maximum endpoint adjustment 0.6. Never auto-face the square.",
+    "terrain":"Flat local pads blend into terrain over 2 units. Terrain supports each entire footprint; no large exposed plinths.",
+    "planned":"Retain existing status/content; use small named garden clearings inside the reserved envelopes, not newly completed buildings."
+  },
+  "square":{"centerXZ":[-5,5],"radius":3.2,"padY":0.1},
+  "entranceSign":{"centerXZ":[-6,19],"yawDeg":0,"maxHeight":2},
+  "attractions":[
+    {"id":"ferrisWheel","number":"07","name":"摩天轮","centerXZ":[19,-8],"padY":0.5,"yawDeg":0,"envelopeXZ":[12,5],"maxHeight":14,"entryXZ":[19,-4.8],"rule":"Wheel plane is XY; axle along Z. Fixed yaw, never dynamically face the camera."},
+    {"id":"carousel","number":"08","name":"旋转木马","centerXZ":[19,7],"padY":0.1,"yawDeg":0,"envelopeXZ":[8,8],"maxHeight":6,"entryXZ":[19,11.5]}
+  ],
+  "paths":[
+    {"id":"main-lane","width":1.8,"pointsXZ":[[-6,19],[-6,14],[-6,9],[-5,5],[-6,0],[-6,-6],[-6,-10]]},
+    {"id":"memory-door","width":1.1,"pointsXZ":[[-6,6],[-9,6.5],[-12.5,5.6]]},
+    {"id":"academy-door","width":1.2,"pointsXZ":[[-6,-3],[-9,-3.5],[-12.6,-5]]},
+    {"id":"neighbor-walk","width":1.0,"pointsXZ":[[-10,6.2],[-9,2],[-9,-3.5]]},
+    {"id":"research-door","width":1.1,"pointsXZ":[[-6,-10],[-3,-9],[1,-8.7]]},
+    {"id":"robotics-door","width":1.0,"pointsXZ":[[-6,0],[-12,-0.5],[-19,-1],[-20.8,-3],[-20.8,-5.2]]},
+    {"id":"studio-door","width":1.0,"pointsXZ":[[-6,12],[-13,12.5],[-18,12],[-19.8,10.8]]},
+    {"id":"future-door","width":1.0,"pointsXZ":[[-2,6],[1,7.5],[4.5,7.6]]},
+    {"id":"meadow-lane","width":1.5,"pointsXZ":[[-6,14],[0,14],[7,14.5],[12,15],[19,15]]},
+    {"id":"east-lane","width":1.4,"pointsXZ":[[19,15],[12,15],[12,8],[12,0],[12,-8],[12,-15],[15,-16.8]]},
+    {"id":"ferris-entry","width":1.2,"pointsXZ":[[12,-4],[16,-4],[19,-4.8]]},
+    {"id":"carousel-entry","width":1.2,"pointsXZ":[[19,15],[19,11.5]]},
+    {"id":"west-platform-link","width":1.5,"pointsXZ":[[-15,-16.8],[-10,-16],[-6,-14],[-6,-10]]}
+  ],
+  "pathRules":"Coordinates are route anchors. Round corners within 0.4 units; no unconstrained spline overshoot. Merge duplicate/shared surfaces and junctions. Sample the final path width, not only centerline, against destination footprints.",
+  "railway":{
+    "id":"operational-railway", "mode":"reversible shuttle; same physical consist reverses travel without teleporting or rotating in place",
+    "centerlineXZ":[[-28,-20],[-23,-20],[-16,-20],[-8,-21.5],[0,-22],[8,-21.5],[16,-20],[23,-20],[28,-20]],
+    "railTopY":1.2,"terrainUnderTrackY":0.9,"reservedHalfWidth":2.3,"safetyMargin":0.6,
+    "maxConsistLength":11.0,"maxCarWidth":1.4,"maxCarHeight":2.6,
+    "platforms":[
+      {"id":"rail-west","name":"来时路站","centerXZ":[-21,-16.8],"dimensionsXZ":[12,1.6],"longAxis":"X","trainMidpointStopXZ":[-21,-20],"accessXZ":[-15,-16.8]},
+      {"id":"rail-east","name":"云上游乐站","centerXZ":[21,-16.8],"dimensionsXZ":[12,1.6],"longAxis":"X","trainMidpointStopXZ":[21,-20],"accessXZ":[15,-16.8]}
+    ],
+    "rules":"Smooth only the middle scenic section; keep both platform-adjacent track sections straight. Stops reference the midpoint of the entire consist, not the locomotive. Account for full front/rear overhang and buffers; never clamp every carriage to an endpoint. Platforms are separate from the station personal destination. No pedestrian crossing is needed in this plan."
+  },
+  "groves":[
+    {"centerXZ":[-29,0],"canopyEnvelopeRadius":2.0,"count":3,"maxHeight":4},
+    {"centerXZ":[-24,16],"canopyEnvelopeRadius":2.0,"count":3,"maxHeight":2.5},
+    {"centerXZ":[-2,-2],"canopyEnvelopeRadius":1.7,"count":3,"maxHeight":3},
+    {"centerXZ":[6,-6],"canopyEnvelopeRadius":2.0,"count":4,"maxHeight":4},
+    {"centerXZ":[29,0],"canopyEnvelopeRadius":2.0,"count":4,"maxHeight":4},
+    {"centerXZ":[28,12],"canopyEnvelopeRadius":2.0,"count":3,"maxHeight":2.5},
+    {"centerXZ":[6,18],"canopyEnvelopeRadius":1.8,"count":4,"maxHeight":1.2}
+  ],
+  "vegetationRule":"All canopy extents must fit inside their grove envelope. Seed 2026. Reject objects intersecting complete path, destination, ride and rail reservations. No spontaneous replacement trees elsewhere. Foreground gardens use low planting.",
+  "clouds":{"centerYRange":[-9,-4],"maxRadius":2.5,"rule":"Below the walkable surface and outside its projected silhouette at the default camera; no ground-level clouds among buildings or rides."},
+  "balloons":{"anchorsXYZ":[[-32,11,-14],[32,13,-15]],"maxEnvelopeRadius":1.6,"bobMax":0.5,"rule":"Decorative only; exclude from camera fitting and verify silhouette separation."},
+  "verification":"This is an authored layout, not a certified collision-free runtime. Validate final instantiated meshes and the full out-and-back train journey; preserve fixed destination centers, orientation and content. Report any conflict that cannot be solved within reserved envelopes."
+}
